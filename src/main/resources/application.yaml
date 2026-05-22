@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: rdv-backend
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/pkfrc_rdv
+    username: postgres
+    password: beroise.
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+
+
+
+  flyway:
+    enabled: false
+    locations: classpath:db/migration
+
+server:
+  port: 9095
