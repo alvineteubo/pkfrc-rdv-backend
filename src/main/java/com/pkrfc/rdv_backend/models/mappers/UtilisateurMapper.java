@@ -3,10 +3,11 @@ package com.pkrfc.rdv_backend.models.mappers;
 import com.pkrfc.rdv_backend.models.dtos.requests.UtilisateurRequest;
 import com.pkrfc.rdv_backend.models.dtos.responses.UtilisateurResponse;
 import com.pkrfc.rdv_backend.models.entities.Utilisateur;
+import org.springframework.data.domain.Page;
 
 public class UtilisateurMapper {
 
-    public  static Utilisateur toentity (UtilisateurRequest dtoRequest){
+    public  static Utilisateur toEntity (UtilisateurRequest dtoRequest){
         return Utilisateur.builder()
                 .nom(dtoRequest.nom())
                 .prenom(dtoRequest.prenom())
@@ -32,5 +33,9 @@ public class UtilisateurMapper {
                 utilisateur.getEmail(),
                 utilisateur.getTelephone()
         );
+    }
+
+    public static Page<UtilisateurResponse> buildPageFromEntities(Page<Utilisateur> page) {
+        return page.map(UtilisateurMapper::toResponse);
     }
 }

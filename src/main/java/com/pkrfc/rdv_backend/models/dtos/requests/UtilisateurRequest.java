@@ -5,6 +5,9 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
 public record UtilisateurRequest(
+
+        String refUtilisateur,
+
         @NotBlank(message = "Le nom est obligatoire")
         @Schema(name = "nom", example = "DASSE", required = true)
         String nom,

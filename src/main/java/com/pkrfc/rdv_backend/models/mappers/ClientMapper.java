@@ -5,6 +5,7 @@ import com.pkrfc.rdv_backend.models.dtos.requests.ClientRequest;
 import com.pkrfc.rdv_backend.models.dtos.responses.ClientResponse;
 import com.pkrfc.rdv_backend.models.entities.Client;
 import com.pkrfc.rdv_backend.models.entities.Utilisateur;
+import org.springframework.data.domain.Page;
 
 public class ClientMapper {
 
@@ -19,5 +20,9 @@ public class ClientMapper {
                 client.getRefClient(),
                 UtilisateurMapper.toResponse(client.getUtilisateur())
         );
+    }
+
+    public static Page<ClientResponse> buildPageFromEntities(Page<Client> page) {
+        return page.map(ClientMapper::toResponse);
     }
 }

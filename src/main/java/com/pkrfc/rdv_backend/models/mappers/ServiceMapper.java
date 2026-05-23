@@ -2,29 +2,33 @@ package com.pkrfc.rdv_backend.models.mappers;
 
 import com.pkrfc.rdv_backend.models.dtos.requests.ServiceRequest;
 import com.pkrfc.rdv_backend.models.dtos.responses.ServiceResponse;
-import com.pkrfc.rdv_backend.models.entities.Service;
+import com.pkrfc.rdv_backend.models.entities.ServiceMetier;
+import org.springframework.data.domain.Page;
 
 public class ServiceMapper {
-    public static Service toEntity (ServiceRequest serviceRequest) {
-        return Service.builder()
+    public static ServiceMetier toEntity (ServiceRequest serviceRequest) {
+        return ServiceMetier.builder()
                 .code(serviceRequest.code())
                 .nom(serviceRequest.nom())
                 .description(serviceRequest.description())
                 .build();
     }
 
-    public static Service updateEntity (Service service, ServiceRequest serviceRequest) {
-        service.setCode(serviceRequest.code());
-        service.setNom(serviceRequest.nom());
-        service.setDescription(serviceRequest.description());
-        return service;
+    public static ServiceMetier updateEntity (ServiceMetier serviceMetier, ServiceRequest serviceRequest) {
+        serviceMetier.setCode(serviceRequest.code());
+        serviceMetier.setNom(serviceRequest.nom());
+        serviceMetier.setDescription(serviceRequest.description());
+        return serviceMetier;
     }
 
-    public static ServiceResponse toResponse (Service service) {
+    public static ServiceResponse toResponse (ServiceMetier serviceMetier) {
         return  new ServiceResponse(
-                service.getRefService(),
-                service.getCode(),
-                service.getNom(),
-                service.getDescription());
+                serviceMetier.getRefService(),
+                serviceMetier.getCode(),
+                serviceMetier.getNom(),
+                serviceMetier.getDescription());
+    }
+    public static Page<ServiceResponse> buildPageFromEntities(Page<ServiceMetier> page) {
+        return page.map(ServiceMapper::toResponse);
     }
 }

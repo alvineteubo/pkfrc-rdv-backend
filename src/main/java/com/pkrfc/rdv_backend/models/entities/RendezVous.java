@@ -5,7 +5,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -35,14 +37,14 @@ public class RendezVous extends AbstractAudit {
 
     @ManyToOne
     @JoinColumn(name = "ref_service", nullable = false)
-    private Service service;
+    private ServiceMetier serviceMetier;
 
     @ManyToOne
     @JoinColumn(name = "id_plage", nullable = false)
     private PlageHoraire plageHoraire;
 
     @Column(name = "date_rdv", nullable = false)
-    private LocalDate dateRdv;
+    private LocalDateTime dateRdv;
 
     @Column(name = "motif", nullable = false, length = 500)
     private String motif;
@@ -50,4 +52,7 @@ public class RendezVous extends AbstractAudit {
     @Enumerated(EnumType.STRING)
     @Column(name = "statut", nullable = false)
     private StatutRendezVous statut ;
+
+    @OneToMany(mappedBy = "rendezVous", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RendezVousParticipant> participants = new ArrayList<>();
 }

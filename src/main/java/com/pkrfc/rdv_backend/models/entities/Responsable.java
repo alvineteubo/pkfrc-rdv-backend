@@ -26,5 +26,5 @@ public class Responsable extends AbstractAudit {
 
     @ManyToOne
     @JoinColumn(name = "ref_service", nullable = false)
-    private Service service;
+    private ServiceMetier serviceMetier;
 }

@@ -1,9 +1,7 @@
 package com.pkrfc.rdv_backend.models.dtos.responses;
 
 
-import com.pkrfc.rdv_backend.models.entities.Client;
-
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public record RendezVousResponse(
@@ -11,7 +9,7 @@ public record RendezVousResponse(
         ResponsableResponse responsable,
         ServiceResponse service,
         PlageHoraireResponse plageHoraire,
-        LocalDate dateRdv,
+        LocalDateTime dateRdv,
         String motif,
         String statut,
         List<ClientResponse> participants

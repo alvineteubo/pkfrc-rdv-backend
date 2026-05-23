@@ -34,7 +34,7 @@ CREATE TABLE rendez_vous
     ref_responsable VARCHAR(255) NOT NULL,
     ref_service     VARCHAR(255) NOT NULL,
     id_plage        VARCHAR(255) NOT NULL,
-    date_rdv        date         NOT NULL,
+    date_rdv        TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     motif           VARCHAR(500) NOT NULL,
     statut          VARCHAR(255) NOT NULL,
     CONSTRAINT pk_rendez_vous PRIMARY KEY (ref_rendez_vous)
