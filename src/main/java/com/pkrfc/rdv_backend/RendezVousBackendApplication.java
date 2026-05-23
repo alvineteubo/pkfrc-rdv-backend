@@ -4,10 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class RdvBackendApplication {
+public class RendezVousBackendApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(RdvBackendApplication.class, args);
+		SpringApplication.run(RendezVousBackendApplication.class, args);
 	}
 
 }
