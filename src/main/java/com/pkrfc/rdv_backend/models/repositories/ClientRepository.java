@@ -11,13 +11,15 @@ import java.util.Optional;
 
 public interface ClientRepository extends JpaRepository<Client, String> {
     Optional<Client> findByUtilisateur_RefUtilisateur(String refUtilisateur);
+
     @Query("""
-    SELECT c FROM Client c
+
+            SELECT c FROM Client c
     WHERE (:keyword IS NULL OR
-           LOWER(c.utilisateur.nom) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
-           LOWER(c.utilisateur.prenom) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
-           LOWER(c.utilisateur.email) LIKE LOWER(CONCAT('%', :keyword, '%'))
-         )
+           LOWER(c.utilisateur.nom) LIKE LOWER(CONCAT('%', CAST(:keyword AS string), '%')) OR
+           LOWER(c.utilisateur.prenom) LIKE LOWER(CONCAT('%', CAST(:keyword AS string), '%')) OR
+           LOWER(c.utilisateur.email) LIKE LOWER(CONCAT('%', CAST(:keyword AS string), '%'))
+          )
     """)
     Page<Client> getAllClientsByKeyword(@Param("keyword") String keyword, Pageable pageable);
-}
+    }

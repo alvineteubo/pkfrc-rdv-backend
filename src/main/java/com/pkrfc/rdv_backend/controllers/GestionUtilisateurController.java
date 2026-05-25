@@ -39,7 +39,7 @@ public class GestionUtilisateurController {
 
     @Operation(summary = "Récupérer un utilisateur par ref")
     @GetMapping("/{ref_utilisateur}")
-    public ResponseEntity<ApiResponse<UtilisateurResponse>> getByRef(@PathVariable String refUtilisateur) {
+    public ResponseEntity<ApiResponse<UtilisateurResponse>> getByRef(@PathVariable("ref_utilisateur") String refUtilisateur) {
         return ResponseEntity.ok(new ApiResponse<>(true,
                 getMessage("success.operation"), utilisateurService.getUtilisateurByRef(refUtilisateur), new Date()));
     }
@@ -69,7 +69,7 @@ public class GestionUtilisateurController {
 
     @Operation(summary = "Supprimer un utilisateur")
     @DeleteMapping("/{ref_utilisateur}")
-    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable String refUtilisateur) {
+    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable("ref_utilisateur") String refUtilisateur) {
         utilisateurService.deleteUtilisateur(refUtilisateur);
         return ResponseEntity.ok(new ApiResponse<>(true,
                 getMessage("success.utilisateur.deleted"), null, new Date()));

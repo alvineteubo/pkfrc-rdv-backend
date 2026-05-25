@@ -33,32 +33,33 @@ public class GestionClientServiceImpl implements GestionClientService {
         Client client;
         Utilisateur utilisateur;
 
-        if (request.refClient() != null) {
+        if (request.refClient() != null && !request.refClient().isBlank()) {
             Client existing = clientRepository.findById(request.refClient())
                     .orElseThrow(() -> new ResourceNotFoundException("Client", "ref", request.refClient()));
 
             utilisateur = existing.getUtilisateur();
-            if (!utilisateur.getEmail().equals(request.utilisateur().email()) && utilisateurRepository.existsByEmail(request.utilisateur().email())) {
+            if (!utilisateur.getEmail().equals(request.utilisateur().email())
+                    && utilisateurRepository.existsByEmail(request.utilisateur().email())) {
                 throw new DuplicateDataException("Client", "email", request.utilisateur().email());
             }
 
             UtilisateurMapper.updateEntity(utilisateur, request.utilisateur());
+            utilisateurRepository.save(utilisateur); // ← sauvegarder modif utilisateur
             client = existing;
 
         } else {
             if (utilisateurRepository.existsByEmail(request.utilisateur().email())) {
                 throw new DuplicateDataException("Client", "email", request.utilisateur().email());
             }
+
             utilisateur = UtilisateurMapper.toEntity(request.utilisateur());
+            utilisateur = utilisateurRepository.save(utilisateur);
             client = ClientMapper.toEntity(request, utilisateur);
         }
 
-        utilisateurRepository.save(utilisateur);
         client = clientRepository.save(client);
-        log.info("Client sauvegardé : {}", client.getRefClient());
         return ClientMapper.toResponse(client);
     }
-
     @Override
     @Transactional(readOnly = true)
     public ClientResponse getClientByRef(String ref) {
@@ -80,6 +81,9 @@ public class GestionClientServiceImpl implements GestionClientService {
     public void deleteClient(String ref) {
         Client client = clientRepository.findById(ref)
                 .orElseThrow(() -> new ResourceNotFoundException("Client", "ref", ref));
+
+        Utilisateur utilisateur = client.getUtilisateur();
         clientRepository.delete(client);
+        utilisateurRepository.delete(utilisateur);
     }
 }

@@ -39,7 +39,7 @@ public class GestionResponsableController {
 
     @Operation(summary = "Récupérer un responsable par ref")
     @GetMapping("/{ref_responsable}")
-    public ResponseEntity<ApiResponse<ResponsableResponse>> getByRef(@PathVariable String refResponsable) {
+    public ResponseEntity<ApiResponse<ResponsableResponse>> getByRef(@PathVariable("ref_responsable") String refResponsable) {
         return ResponseEntity.ok(new ApiResponse<>(true, getMessage("success.operation"), responsableService.getResponsableByRef(refResponsable), new Date()));
     }
 
@@ -62,8 +62,8 @@ public class GestionResponsableController {
 
     @Operation(summary = "Supprimer un responsable")
     @DeleteMapping("/{ref_responsable}")
-    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable String refResponsable) {
-        responsableService.supprimerResponsable(refResponsable);
+    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable("ref_responsable") String refResponsable) {
+        responsableService.deleteResponsable(refResponsable);
         return ResponseEntity.ok(new ApiResponse<>(true, getMessage("success.responsable.deleted"), null, new Date()));
     }
 }

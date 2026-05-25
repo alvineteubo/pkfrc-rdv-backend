@@ -3,7 +3,7 @@ package com.pkrfc.rdv_backend.services.impl;
 import com.pkrfc.rdv_backend.exceptions.ResourceNotFoundException;
 import com.pkrfc.rdv_backend.models.dtos.responses.ServiceResponse;
 import com.pkrfc.rdv_backend.models.mappers.ServiceMapper;
-import com.pkrfc.rdv_backend.models.repositories.ServiceRepository;
+import com.pkrfc.rdv_backend.models.repositories.ServiceMetierRepository;
 import com.pkrfc.rdv_backend.services.inter.GestionServiceMetierService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,13 +17,13 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class GestionServiceMetierServiceImpl implements GestionServiceMetierService {
 
-    private final ServiceRepository serviceRepository;
+    private final ServiceMetierRepository serviceMetierRepository;
 
     @Override
     @Transactional(readOnly = true)
     public ServiceResponse getServiceByRef(String ref) {
         return ServiceMapper.toResponse(
-                serviceRepository.findById(ref)
+                serviceMetierRepository.findById(ref)
                         .orElseThrow(() -> new ResourceNotFoundException("ServiceMetier", "ref", ref))
         );
     }
@@ -32,7 +32,7 @@ public class GestionServiceMetierServiceImpl implements GestionServiceMetierServ
     @Transactional(readOnly = true)
     public Page<ServiceResponse> getAllServices(String keyword, Pageable pageable) {
         return ServiceMapper.buildPageFromEntities(
-                serviceRepository.getAllServicesByKeyword(keyword, pageable)
+                serviceMetierRepository.getAllServicesByKeyword(keyword, pageable)
         );
     }
 }

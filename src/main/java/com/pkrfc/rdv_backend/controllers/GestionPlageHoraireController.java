@@ -30,7 +30,7 @@ public class GestionPlageHoraireController {
 
     @Operation(summary = "Récupérer une plage horaire par id")
     @GetMapping("/{id_plage}")
-    public ResponseEntity<ApiResponse<PlageHoraireResponse>> getById(@PathVariable String idPlage) {
+    public ResponseEntity<ApiResponse<PlageHoraireResponse>> getById(@PathVariable("id_plage") String idPlage) {
         return ResponseEntity.ok(new ApiResponse<>(true,
                 getMessage("success.operation"), plageHoraireService.getPlageHoraireById(idPlage), new Date()));
     }

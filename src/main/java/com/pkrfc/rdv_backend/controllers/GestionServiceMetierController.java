@@ -28,7 +28,7 @@ public class GestionServiceMetierController {
 
     @Operation(summary = "Récupérer un service par ref")
     @GetMapping("/{ref_service}")
-    public ResponseEntity<ApiResponse<ServiceResponse>> getByRef(@PathVariable String refService) {
+    public ResponseEntity<ApiResponse<ServiceResponse>> getByRef(@PathVariable("ref_service") String refService) {
         return ResponseEntity.ok(new ApiResponse<>(true,
                 getMessage("success.operation"), serviceMetierService.getServiceByRef(refService), new Date()));
     }

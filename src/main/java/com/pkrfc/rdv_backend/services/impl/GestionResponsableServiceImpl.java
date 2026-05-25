@@ -10,7 +10,7 @@ import com.pkrfc.rdv_backend.models.entities.Utilisateur;
 import com.pkrfc.rdv_backend.models.mappers.ResponsableMapper;
 import com.pkrfc.rdv_backend.models.mappers.UtilisateurMapper;
 import com.pkrfc.rdv_backend.models.repositories.ResponsableRepository;
-import com.pkrfc.rdv_backend.models.repositories.ServiceRepository;
+import com.pkrfc.rdv_backend.models.repositories.ServiceMetierRepository;
 import com.pkrfc.rdv_backend.models.repositories.UtilisateurRepository;
 import com.pkrfc.rdv_backend.services.inter.GestionResponsableService;
 import lombok.RequiredArgsConstructor;
@@ -28,19 +28,20 @@ public class GestionResponsableServiceImpl implements GestionResponsableService 
 
     private final ResponsableRepository responsableRepository;
     private final UtilisateurRepository utilisateurRepository;
-    private final ServiceRepository serviceRepository;
+    private final ServiceMetierRepository serviceMetierRepository;
+
 
     @Override
     @Transactional
     public ResponsableResponse createOrUpdateResponsable(ResponsableRequest request) {
 
-        ServiceMetier serviceMetier = serviceRepository.findById(request.refService())
+        ServiceMetier serviceMetier = serviceMetierRepository.findById(request.refService())
                 .orElseThrow(() -> new ResourceNotFoundException("ServiceMetier", "ref", request.refService()));
 
         Responsable responsable;
         Utilisateur utilisateur;
 
-        if (request.refResponsable() != null) {
+        if (request.refResponsable() != null && !request.refResponsable().isBlank()) {
             Responsable existing = responsableRepository.findById(request.refResponsable())
                     .orElseThrow(() -> new ResourceNotFoundException("Responsable", "ref", request.refResponsable()));
 
@@ -51,6 +52,7 @@ public class GestionResponsableServiceImpl implements GestionResponsableService 
             }
 
             UtilisateurMapper.updateEntity(utilisateur, request.utilisateur());
+            utilisateurRepository.save(utilisateur);
             existing.setServiceMetier(serviceMetier);
             responsable = existing;
 
@@ -58,13 +60,12 @@ public class GestionResponsableServiceImpl implements GestionResponsableService 
             if (utilisateurRepository.existsByEmail(request.utilisateur().email())) {
                 throw new DuplicateDataException("Responsable", "email", request.utilisateur().email());
             }
-
             utilisateur = UtilisateurMapper.toEntity(request.utilisateur());
+            utilisateur = utilisateurRepository.save(utilisateur); // ← sauvegarder AVANT
             responsable = ResponsableMapper.toEntity(request, utilisateur, serviceMetier);
         }
-
-        utilisateurRepository.save(utilisateur);
         responsable = responsableRepository.save(responsable);
+        log.info("Responsable sauvegardé : {}", responsable.getRefResponsable());
         return ResponsableMapper.toResponse(responsable);
     }
 
@@ -85,11 +86,14 @@ public class GestionResponsableServiceImpl implements GestionResponsableService 
         );
     }
 
-    @Override
     @Transactional
-    public void supprimerResponsable(String ref) {
+    @Override
+    public void deleteResponsable(String ref) {
         Responsable responsable = responsableRepository.findById(ref)
                 .orElseThrow(() -> new ResourceNotFoundException("Responsable", "ref", ref));
+
+        Utilisateur utilisateur = responsable.getUtilisateur();
         responsableRepository.delete(responsable);
+        utilisateurRepository.delete(utilisateur);
     }
 }

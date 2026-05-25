@@ -15,22 +15,15 @@ import java.util.List;
 
 public interface RendezVousRepository extends JpaRepository<RendezVous, String> {
     @Query("""
-
-            SELECT r FROM RendezVous r
-    JOIN r.participants p
+    SELECT DISTINCT r FROM RendezVous r
+    LEFT JOIN RendezVousParticipant p ON p.rendezVous = r
     WHERE (:keyword IS NULL OR
-           LOWER(r.motif) LIKE LOWER(CONCAT('%', :keyword, '%'))
+           LOWER(r.motif) LIKE LOWER(CONCAT('%', CAST(:keyword AS string), '%'))
           )
-    AND (:refClient IS NULL OR p.client.refClient = :refClient)
-    AND (:refResponsable IS NULL OR r.responsable.refResponsable = :refResponsable)
+    AND (:refClient IS NULL OR p.client.refClient = CAST(:refClient AS string))
+    AND (:refResponsable IS NULL OR r.responsable.refResponsable = CAST(:refResponsable AS string))
     """)
-    Page<RendezVous> getAllRendezVousByKeyword(
-            @Param("keyword") String keyword,
-            @Param("refClient") String refClient,
-            @Param("refResponsable") String refResponsable,
-            Pageable pageable);
-
-
+    Page<RendezVous> getAllRendezVousByKeyword(@Param("keyword") String keyword, @Param("refClient") String refClient, @Param("refResponsable") String refResponsable, Pageable pageable);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("""

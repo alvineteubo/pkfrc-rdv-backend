@@ -25,5 +25,27 @@ spring:
     enabled: true
     locations: classpath:db/migration
 
+app:
+  address: http://localhost
+  port: 9095
 server:
   port: 9095
+
+springdoc:
+  packages-to-scan: com.pkrfc.rdv_backend.controllers
+  api-docs:
+    path: /v3/api-docs
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    operations-sorter: method
+    tags-sorter: alpha
+    doc-expansion: none
+
+logging:
+  level:
+    org.hibernate.orm.connections.pooling: WARN
+    org.hibernate.engine.transaction.jta.platform: WARN
+    org.flywaydb: WARN
+    com.zaxxer.hikari: WARN

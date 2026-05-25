@@ -17,12 +17,12 @@ public interface UtilisateurRepository extends JpaRepository<Utilisateur, String
     Optional<Utilisateur> findByRefUtilisateur (String refUtilisateur);
 
     @Query("""
-        SELECT u FROM Utilisateur u
-        WHERE (:keyword IS NULL OR
-               LOWER(u.nom) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
-               LOWER(u.prenom) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
-               LOWER(u.email) LIKE LOWER(CONCAT('%', :keyword, '%')) 
-             )
-        """)
+    SELECT u FROM Utilisateur u
+    WHERE (:keyword IS NULL OR
+           LOWER(u.nom) LIKE LOWER(CONCAT('%', CAST(:keyword AS string), '%')) OR
+           LOWER(u.prenom) LIKE LOWER(CONCAT('%', CAST(:keyword AS string), '%')) OR
+           LOWER(u.email) LIKE LOWER(CONCAT('%', CAST(:keyword AS string), '%'))
+         )
+    """)
     Page<Utilisateur> getAllUtilisateursByKeyword(@Param("keyword") String keyword, Pageable pageable);
 }

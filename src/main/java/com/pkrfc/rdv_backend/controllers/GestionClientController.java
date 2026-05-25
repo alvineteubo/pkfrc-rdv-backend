@@ -39,7 +39,7 @@ public class GestionClientController {
 
     @Operation(summary = "Récupérer un client par ref")
     @GetMapping("/{ref_client}")
-    public ResponseEntity<ApiResponse<ClientResponse>> getByRef(@PathVariable String refClient) {
+    public ResponseEntity<ApiResponse<ClientResponse>> getByRef(@PathVariable("ref_client") String refClient) {
         return ResponseEntity.ok(new ApiResponse<>(true, getMessage("success.operation"),
                 clientService.getClientByRef(refClient), new Date()));
     }
@@ -62,7 +62,7 @@ public class GestionClientController {
 
     @Operation(summary = "Supprimer un client")
     @DeleteMapping("/{ref_client}")
-    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable String refClient) {
+    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable("ref_client") String refClient) {
         clientService.deleteClient(refClient);
         return ResponseEntity.ok(new ApiResponse<>(true, getMessage("success.client.deleted"), null, new Date()));
     }

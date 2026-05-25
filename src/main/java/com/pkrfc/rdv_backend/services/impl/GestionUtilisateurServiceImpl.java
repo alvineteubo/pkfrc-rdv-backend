@@ -23,25 +23,23 @@ public class GestionUtilisateurServiceImpl implements GestionUtilisateurService 
     @Override
     @Transactional
     public UtilisateurResponse createOrUpdateUtilisateur(UtilisateurRequest request) {
-
         Utilisateur utilisateur;
-
-        if (request.refUtilisateur() != null) {
+        if (request.refUtilisateur() != null && !request.refUtilisateur().isBlank()) {
             Utilisateur existing = utilisateurRepository.findById(request.refUtilisateur())
                     .orElseThrow(() -> new ResourceNotFoundException("Utilisateur", "ref", request.refUtilisateur()));
 
-            if (!existing.getEmail().equals(request.email()) && utilisateurRepository.existsByEmail(request.email())) {
+            if (!existing.getEmail().equals(request.email())
+                    && utilisateurRepository.existsByEmail(request.email())) {
                 throw new DuplicateDataException("Utilisateur", "email", request.email());
             }
             utilisateur = UtilisateurMapper.updateEntity(existing, request);
-
         } else {
             if (utilisateurRepository.existsByEmail(request.email())) {
                 throw new DuplicateDataException("Utilisateur", "email", request.email());
             }
-
             utilisateur = UtilisateurMapper.toEntity(request);
         }
+
         return UtilisateurMapper.toResponse(utilisateurRepository.save(utilisateur));
     }
 

@@ -1,6 +1,8 @@
 package com.pkrfc.rdv_backend.models.repositories;
 
 import com.pkrfc.rdv_backend.models.entities.PlageHoraire;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -16,4 +18,9 @@ public interface PlageHoraireRepository extends JpaRepository<PlageHoraire, Stri
     """)
     Optional<PlageHoraire> findByHeure(@Param("heure") LocalTime heure);
 
+    @Query("""
+    SELECT p FROM PlageHoraire p
+    ORDER BY p.heureDebut ASC
+    """)
+    Page<PlageHoraire> findAllOrderByHeureDebutAsc(Pageable pageable);
 }

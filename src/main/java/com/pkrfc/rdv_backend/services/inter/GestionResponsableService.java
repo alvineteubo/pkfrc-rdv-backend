@@ -4,10 +4,11 @@ import com.pkrfc.rdv_backend.models.dtos.requests.ResponsableRequest;
 import com.pkrfc.rdv_backend.models.dtos.responses.ResponsableResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
 
 public interface GestionResponsableService {
     ResponsableResponse createOrUpdateResponsable(ResponsableRequest request);
     ResponsableResponse getResponsableByRef(String ref);
     Page<ResponsableResponse> getAllResponsablesByKeyword(String keyword, String refService, Pageable pageable);
-    void supprimerResponsable(String ref);
+    void deleteResponsable(String ref);
 }
