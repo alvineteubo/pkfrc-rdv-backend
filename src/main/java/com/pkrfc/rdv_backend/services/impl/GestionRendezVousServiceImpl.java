@@ -62,7 +62,7 @@ public class GestionRendezVousServiceImpl implements GestionRendezVousService {
 
     private PlageHoraire deduirePlageHoraire(LocalDateTime dateRdv) {
         LocalTime heure = dateRdv.toLocalTime();
-        return plageHoraireRepository.findByHeure(heure)
+        return plageHoraireRepository.findByHeureDebut(heure)
                 .orElseThrow(() -> new BadRequestException(getMessage("rdv.plage.not.found")));
     }
 
@@ -177,6 +177,7 @@ public RendezVousResponse retirerParticipant(String refRdv, String refClient) {
             .orElseThrow(() -> new ResourceNotFoundException("Participant", "refClient", refClient));
 
     participantRepository.delete(participant);
+    participantRepository.flush();
     rendezVous = rendezVousRepository.findById(refRdv).orElseThrow();
     return buildResponse(rendezVous);
 }

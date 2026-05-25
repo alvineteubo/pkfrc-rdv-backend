@@ -13,10 +13,9 @@ import java.util.Optional;
 public interface PlageHoraireRepository extends JpaRepository<PlageHoraire, String> {
     @Query("""
     SELECT p FROM PlageHoraire p
-    WHERE p.heureDebut <= :heure
-    AND p.heureFin > :heure
+    WHERE p.heureDebut = :heure
     """)
-    Optional<PlageHoraire> findByHeure(@Param("heure") LocalTime heure);
+    Optional<PlageHoraire> findByHeureDebut(@Param("heure") LocalTime heure);
 
     @Query("""
     SELECT p FROM PlageHoraire p
