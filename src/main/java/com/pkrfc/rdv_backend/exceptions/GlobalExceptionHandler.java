@@ -2,6 +2,7 @@ package com.pkrfc.rdv_backend.exceptions;
 
 import com.pkrfc.rdv_backend.models.dtos.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -65,6 +66,18 @@ public class GlobalExceptionHandler {
         log.error("400 VALIDATION ERROR");
         return new ResponseEntity<>(
                 new ApiResponse<>(false, "Des champs sont invalides", errors, new Date()), HttpStatus.BAD_REQUEST
+        );
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ResponseEntity<ApiResponse<String>> handleDataIntegrityViolation(
+            DataIntegrityViolationException ex, WebRequest request) {
+        log.error("409 CONFLICT (contrainte DB) - {}", ex.getMostSpecificCause().getMessage());
+        return new ResponseEntity<>(
+                new ApiResponse<>(false, "Opération impossible : contrainte d'intégrité violée",
+                        request.getDescription(false), new Date()),
+                HttpStatus.CONFLICT
         );
     }
 

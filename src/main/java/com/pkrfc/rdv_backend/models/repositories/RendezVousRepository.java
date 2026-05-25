@@ -37,11 +37,5 @@ public interface RendezVousRepository extends JpaRepository<RendezVous, String> 
             @Param("plageHoraire") PlageHoraire plageHoraire,
             @Param("dateRdv") LocalDateTime dateRdv);
 
-    @Query("""
-    SELECT COUNT(p) FROM RendezVousParticipant p
-    WHERE p.rendezVous = :rendezVous
-    """)
-    long countParticipants(@Param("rendezVous") RendezVous rendezVous);
-
 }
 

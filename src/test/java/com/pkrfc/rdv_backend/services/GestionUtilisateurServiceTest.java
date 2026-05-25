@@ -150,7 +150,7 @@ class GestionUtilisateurServiceTest {
     @DisplayName("Consulter un utilisateur par ref — succès")
     void getUtilisateurByRef_Success() {
         // GIVEN
-        when(utilisateurRepository.findByRefUtilisateur("uuid-utilisateur-123"))
+        when(utilisateurRepository.findById("uuid-utilisateur-123"))
                 .thenReturn(Optional.of(utilisateur));
 
         // WHEN
@@ -166,7 +166,7 @@ class GestionUtilisateurServiceTest {
     @DisplayName("Consulter un utilisateur par ref — introuvable")
     void getUtilisateurByRef_NotFound_LanceException() {
         // GIVEN
-        when(utilisateurRepository.findByRefUtilisateur("bad-uuid"))
+        when(utilisateurRepository.findById("bad-uuid"))
                 .thenReturn(Optional.empty());
 
         // WHEN & THEN

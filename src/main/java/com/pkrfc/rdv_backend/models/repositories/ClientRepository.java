@@ -1,6 +1,7 @@
 package com.pkrfc.rdv_backend.models.repositories;
 
 import com.pkrfc.rdv_backend.models.entities.Client;
+import com.pkrfc.rdv_backend.models.entities.Utilisateur;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,6 +12,8 @@ import java.util.Optional;
 
 public interface ClientRepository extends JpaRepository<Client, String> {
     Optional<Client> findByUtilisateur_RefUtilisateur(String refUtilisateur);
+
+    boolean existsByUtilisateur(Utilisateur utilisateur);
 
     @Query("""
 

@@ -51,7 +51,7 @@ public class GestionRendezVousServiceImpl implements GestionRendezVousService {
     }
 
     private Responsable validerResponsable(String refResponsable) {
-        return responsableRepository.findById(refResponsable)
+        return responsableRepository.findByIdWithLock(refResponsable)
                 .orElseThrow(() -> new ResourceNotFoundException("Responsable", "ref", refResponsable));
     }
 
@@ -89,7 +89,8 @@ public class GestionRendezVousServiceImpl implements GestionRendezVousService {
     }
 
     private RendezVousResponse buildResponse(RendezVous rendezVous) {
-        List<ClientResponse> participants = rendezVous.getParticipants()
+        List<ClientResponse> participants = participantRepository
+                 .findAllByRendezVous(rendezVous)
                 .stream()
                 .map(p -> ClientMapper.toResponse(p.getClient()))
                 .toList();
@@ -115,6 +116,7 @@ public class GestionRendezVousServiceImpl implements GestionRendezVousService {
                 .client(client)
                 .build();
         participantRepository.save(participant);
+        participantRepository.flush();
         return buildResponse(rendezVous);
     }
 
@@ -160,8 +162,7 @@ public RendezVousResponse ajouterParticipant(String refRdv, String refClient) {
             .client(client)
             .build();
     participantRepository.save(participant);
-    rendezVous = rendezVousRepository.findById(refRdv).orElseThrow();
-    log.info("Participant {} ajouté au RDV {}", refClient, refRdv);
+    participantRepository.flush();
     return buildResponse(rendezVous);
 }
 

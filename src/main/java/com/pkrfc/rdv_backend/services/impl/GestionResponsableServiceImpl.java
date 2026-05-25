@@ -1,6 +1,5 @@
 package com.pkrfc.rdv_backend.services.impl;
 
-import com.pkrfc.rdv_backend.exceptions.DuplicateDataException;
 import com.pkrfc.rdv_backend.exceptions.ResourceNotFoundException;
 import com.pkrfc.rdv_backend.models.dtos.requests.ResponsableRequest;
 import com.pkrfc.rdv_backend.models.dtos.responses.ResponsableResponse;
@@ -8,7 +7,7 @@ import com.pkrfc.rdv_backend.models.entities.Responsable;
 import com.pkrfc.rdv_backend.models.entities.ServiceMetier;
 import com.pkrfc.rdv_backend.models.entities.Utilisateur;
 import com.pkrfc.rdv_backend.models.mappers.ResponsableMapper;
-import com.pkrfc.rdv_backend.models.mappers.UtilisateurMapper;
+import com.pkrfc.rdv_backend.models.repositories.ClientRepository;
 import com.pkrfc.rdv_backend.models.repositories.ResponsableRepository;
 import com.pkrfc.rdv_backend.models.repositories.ServiceMetierRepository;
 import com.pkrfc.rdv_backend.models.repositories.UtilisateurRepository;
@@ -26,45 +25,33 @@ import org.springframework.transaction.annotation.Transactional;
 public class GestionResponsableServiceImpl implements GestionResponsableService {
 
     private final ResponsableRepository responsableRepository;
+    private final ClientRepository clientRepository;
     private final UtilisateurRepository utilisateurRepository;
     private final ServiceMetierRepository serviceMetierRepository;
-
+    private final ServiceHelper serviceHelper;
 
     @Override
     @Transactional
     public ResponsableResponse createOrUpdateResponsable(ResponsableRequest request) {
-
         ServiceMetier serviceMetier = serviceMetierRepository.findById(request.refService())
                 .orElseThrow(() -> new ResourceNotFoundException("ServiceMetier", "ref", request.refService()));
 
         Responsable responsable;
-        Utilisateur utilisateur;
 
         if (request.refResponsable() != null && !request.refResponsable().isBlank()) {
             Responsable existing = responsableRepository.findById(request.refResponsable())
                     .orElseThrow(() -> new ResourceNotFoundException("Responsable", "ref", request.refResponsable()));
-
-            utilisateur = existing.getUtilisateur();
-            if (!utilisateur.getEmail().equals(request.utilisateur().email())
-                    && utilisateurRepository.existsByEmail(request.utilisateur().email())) {
-                throw new DuplicateDataException("Responsable", "email", request.utilisateur().email());
-            }
-
-            UtilisateurMapper.updateEntity(utilisateur, request.utilisateur());
-            utilisateurRepository.save(utilisateur);
+            serviceHelper.mettreAJourUtilisateur(existing.getUtilisateur(), request.utilisateur());
             existing.setServiceMetier(serviceMetier);
             responsable = existing;
-
+            log.info("Responsable mis à jour : {}", request.refResponsable());
         } else {
-            if (utilisateurRepository.existsByEmail(request.utilisateur().email())) {
-                throw new DuplicateDataException("Responsable", "email", request.utilisateur().email());
-            }
-            utilisateur = UtilisateurMapper.toEntity(request.utilisateur());
-            utilisateur = utilisateurRepository.save(utilisateur); // ← sauvegarder AVANT
+            Utilisateur utilisateur = serviceHelper.creerUtilisateur(request.utilisateur());
             responsable = ResponsableMapper.toEntity(request, utilisateur, serviceMetier);
+            log.info("Création responsable pour email : {}", request.utilisateur().email());
         }
+
         responsable = responsableRepository.save(responsable);
-        log.info("Responsable sauvegardé : {}", responsable.getRefResponsable());
         return ResponsableMapper.toResponse(responsable);
     }
 
@@ -93,6 +80,11 @@ public class GestionResponsableServiceImpl implements GestionResponsableService 
 
         Utilisateur utilisateur = responsable.getUtilisateur();
         responsableRepository.delete(responsable);
-        utilisateurRepository.delete(utilisateur);
+
+        // Ne supprime l'utilisateur que s'il n'est pas également client
+        if (!clientRepository.existsByUtilisateur(utilisateur)) {
+            utilisateurRepository.delete(utilisateur);
+        }
+        log.info("Responsable supprimé : {}", ref);
     }
 }

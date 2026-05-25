@@ -9,16 +9,18 @@ import com.pkrfc.rdv_backend.models.mappers.UtilisateurMapper;
 import com.pkrfc.rdv_backend.models.repositories.UtilisateurRepository;
 import com.pkrfc.rdv_backend.services.inter.GestionUtilisateurService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class GestionUtilisateurServiceImpl implements GestionUtilisateurService {
-    private final UtilisateurRepository utilisateurRepository;
 
+    private final UtilisateurRepository utilisateurRepository;
 
     @Override
     @Transactional
@@ -33,11 +35,13 @@ public class GestionUtilisateurServiceImpl implements GestionUtilisateurService 
                 throw new DuplicateDataException("Utilisateur", "email", request.email());
             }
             utilisateur = UtilisateurMapper.updateEntity(existing, request);
+            log.info("Utilisateur mis à jour : {}", request.refUtilisateur());
         } else {
             if (utilisateurRepository.existsByEmail(request.email())) {
                 throw new DuplicateDataException("Utilisateur", "email", request.email());
             }
             utilisateur = UtilisateurMapper.toEntity(request);
+            log.info("Création utilisateur pour email : {}", request.email());
         }
 
         return UtilisateurMapper.toResponse(utilisateurRepository.save(utilisateur));
@@ -47,7 +51,7 @@ public class GestionUtilisateurServiceImpl implements GestionUtilisateurService 
     @Transactional(readOnly = true)
     public UtilisateurResponse getUtilisateurByRef(String refUtilisateur) {
         return UtilisateurMapper.toResponse(
-                utilisateurRepository.findByRefUtilisateur(refUtilisateur)
+                utilisateurRepository.findById(refUtilisateur)
                         .orElseThrow(() -> new ResourceNotFoundException("Utilisateur", "ref", refUtilisateur))
         );
     }
@@ -74,5 +78,6 @@ public class GestionUtilisateurServiceImpl implements GestionUtilisateurService 
         Utilisateur utilisateur = utilisateurRepository.findById(ref)
                 .orElseThrow(() -> new ResourceNotFoundException("Utilisateur", "ref", ref));
         utilisateurRepository.delete(utilisateur);
+        log.info("Utilisateur supprimé : {}", ref);
     }
 }

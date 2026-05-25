@@ -17,9 +17,5 @@ public interface PlageHoraireRepository extends JpaRepository<PlageHoraire, Stri
     """)
     Optional<PlageHoraire> findByHeureDebut(@Param("heure") LocalTime heure);
 
-    @Query("""
-    SELECT p FROM PlageHoraire p
-    ORDER BY p.heureDebut ASC
-    """)
-    Page<PlageHoraire> findAllOrderByHeureDebutAsc(Pageable pageable);
+    Page<PlageHoraire> findAll(Pageable pageable);
 }

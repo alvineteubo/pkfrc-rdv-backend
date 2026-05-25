@@ -15,6 +15,7 @@ public record UtilisateurRequest(
         @Schema(name = "prenom", example = "Alvine")
         String prenom,
 
+        @NotBlank(message = "L'email est obligatoire")
         @Email(message = "L'email n'est pas valide")
         @Schema(name = "email", example = "test@gmail.com")
         String email,

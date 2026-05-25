@@ -8,8 +8,10 @@ import com.pkrfc.rdv_backend.models.dtos.responses.ClientResponse;
 import com.pkrfc.rdv_backend.models.entities.Client;
 import com.pkrfc.rdv_backend.models.entities.Utilisateur;
 import com.pkrfc.rdv_backend.models.repositories.ClientRepository;
+import com.pkrfc.rdv_backend.models.repositories.ResponsableRepository;
 import com.pkrfc.rdv_backend.models.repositories.UtilisateurRepository;
 import com.pkrfc.rdv_backend.services.impl.GestionClientServiceImpl;
+import com.pkrfc.rdv_backend.services.impl.ServiceHelper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,7 +34,13 @@ class GestionClientServiceTest {
     private ClientRepository clientRepository;
 
     @Mock
+    private ResponsableRepository responsableRepository;
+
+    @Mock
     private UtilisateurRepository utilisateurRepository;
+
+    @Mock
+    private ServiceHelper serviceHelper;
 
     @InjectMocks
     private GestionClientServiceImpl clientService;
@@ -76,8 +84,7 @@ class GestionClientServiceTest {
     @DisplayName("Créer un client avec succès")
     void creerClient_Success() {
         // GIVEN
-        when(utilisateurRepository.existsByEmail(any())).thenReturn(false);
-        when(utilisateurRepository.save(any())).thenReturn(utilisateur);
+        when(serviceHelper.creerUtilisateur(any())).thenReturn(utilisateur);
         when(clientRepository.save(any())).thenReturn(client);
 
         // WHEN
@@ -86,7 +93,7 @@ class GestionClientServiceTest {
         // THEN
         assertNotNull(response);
         assertEquals("uuid-client-123", response.refClient());
-        verify(utilisateurRepository, times(1)).save(any());
+        verify(serviceHelper, times(1)).creerUtilisateur(any());
         verify(clientRepository, times(1)).save(any());
     }
 
@@ -94,14 +101,14 @@ class GestionClientServiceTest {
     @DisplayName("Créer un client — email déjà utilisé")
     void creerClient_EmailDuplique_LanceException() {
         // GIVEN
-        when(utilisateurRepository.existsByEmail(any())).thenReturn(true);
+        when(serviceHelper.creerUtilisateur(any()))
+                .thenThrow(new DuplicateDataException("Utilisateur", "email", "paul.kamga@gmail.com"));
 
         // WHEN & THEN
         assertThrows(DuplicateDataException.class, () ->
                 clientService.createOrUpdateClient(requestCreation)
         );
         verify(clientRepository, never()).save(any());
-        verify(utilisateurRepository, never()).save(any());
     }
 
 
@@ -111,9 +118,7 @@ class GestionClientServiceTest {
         // GIVEN
         when(clientRepository.findById("uuid-client-123"))
                 .thenReturn(Optional.of(client));
-        when(utilisateurRepository.existsByEmail("paul.kamga.new@gmail.com"))
-                .thenReturn(false);
-        when(utilisateurRepository.save(any())).thenReturn(utilisateur);
+        when(serviceHelper.mettreAJourUtilisateur(any(), any())).thenReturn(utilisateur);
         when(clientRepository.save(any())).thenReturn(client);
 
         // WHEN
@@ -121,7 +126,7 @@ class GestionClientServiceTest {
 
         // THEN
         assertNotNull(response);
-        verify(utilisateurRepository, times(1)).save(any());
+        verify(serviceHelper, times(1)).mettreAJourUtilisateur(any(), any());
         verify(clientRepository, times(1)).save(any());
     }
 
@@ -149,8 +154,8 @@ class GestionClientServiceTest {
         // GIVEN
         when(clientRepository.findById("uuid-client-123"))
                 .thenReturn(Optional.of(client));
-        when(utilisateurRepository.existsByEmail("paul.kamga.new@gmail.com"))
-                .thenReturn(true);
+        when(serviceHelper.mettreAJourUtilisateur(any(), any()))
+                .thenThrow(new DuplicateDataException("Utilisateur", "email", "paul.kamga.new@gmail.com"));
 
         // WHEN & THEN
         assertThrows(DuplicateDataException.class, () ->
@@ -195,12 +200,14 @@ class GestionClientServiceTest {
         // GIVEN
         when(clientRepository.findById("uuid-client-123"))
                 .thenReturn(Optional.of(client));
+        when(responsableRepository.existsByUtilisateur(utilisateur)).thenReturn(false);
 
         // WHEN
         clientService.deleteClient("uuid-client-123");
 
         // THEN
         verify(clientRepository, times(1)).delete(client);
+        verify(utilisateurRepository, times(1)).delete(utilisateur);
     }
 
     @Test

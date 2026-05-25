@@ -13,7 +13,6 @@ public interface UtilisateurRepository extends JpaRepository<Utilisateur, String
     boolean existsByEmail(String email);
 
     Optional<Utilisateur> findByEmail(String email);
-    Optional<Utilisateur> findByRefUtilisateur (String refUtilisateur);
 
     @Query("""
     SELECT u FROM Utilisateur u
