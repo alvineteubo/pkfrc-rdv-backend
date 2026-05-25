@@ -1,6 +1,5 @@
 package com.pkrfc.rdv_backend.models.repositories;
 
-import com.pkrfc.rdv_backend.models.dtos.responses.UtilisateurResponse;
 import com.pkrfc.rdv_backend.models.entities.Utilisateur;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
